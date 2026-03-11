@@ -81,6 +81,40 @@ input:focus {
 
 .field {
     margin-bottom: 1rem;
+    position: relative;
+}
+
+.autocomplete-wrapper {
+    position: relative;
+}
+
+.suggestions {
+    list-style: none;
+    margin: 0.3rem 0 0;
+    padding: 0.25rem 0;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 30;
+    max-height: 220px;
+    overflow-y: auto;
+    border-radius: 10px;
+    border: 1px solid #334155;
+    background: #020617;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+}
+
+.suggestions li {
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #e2e8f0;
+}
+
+.suggestions li:hover,
+.suggestions li.active {
+    background: rgba(99, 102, 241, 0.22);
 }
 
 .error {

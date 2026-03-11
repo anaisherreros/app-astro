@@ -1,9 +1,8 @@
 from django.http import JsonResponse
-from pathlib import Path
-import json
-import time
+from django.shortcuts import render
 
 from .services.chart_service import get_chart_info
+from .location.place import search_city_suggestions
 
 
 def health(request):
@@ -35,3 +34,12 @@ def chart(request):
             "error": str(e),
             "traceback": traceback.format_exc(),
         }, status=500)
+
+
+def city_suggestions(request):
+    """
+    Endpoint JSON para sugerencias de ciudad en el autocomplete.
+    """
+    query = request.GET.get("q", "")
+    suggestions = search_city_suggestions(query, limit=12)
+    return JsonResponse({"results": suggestions})

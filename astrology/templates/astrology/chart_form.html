@@ -27,7 +27,10 @@
 
             <div class="field">
                 <label for="birth_place">Lugar de nacimiento</label>
-                <input id="birth_place" name="birth_place" type="text" placeholder="Ciudad, País" required />
+                <div class="autocomplete-wrapper">
+                    <input id="birth_place" name="birth_place" type="text" placeholder="Ciudad, País (ej: barcelona, ES)" autocomplete="off" required />
+                    <ul id="city-suggestions" class="suggestions" hidden></ul>
+                </div>
                 <div class="error" id="error_birth_place"></div>
             </div>
 

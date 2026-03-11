@@ -2,6 +2,11 @@ const form = document.getElementById("chart-form");
 const submitBtn = document.getElementById("submit-btn");
 const resultBox = document.getElementById("result");
 const resultContent = document.getElementById("result-content");
+const birthPlaceInput = document.getElementById("birth_place");
+const suggestionsList = document.getElementById("city-suggestions");
+let suggestionsData = [];
+let activeSuggestionIndex = -1;
+let debounceTimer = null;
 
 function setError(id, message) {
     const el = document.getElementById("error_" + id);
@@ -9,6 +14,118 @@ function setError(id, message) {
         el.textContent = message || "";
     }
 }
+
+function renderSuggestions(items) {
+    suggestionsData = items;
+    activeSuggestionIndex = -1;
+
+    if (!items.length) {
+        suggestionsList.hidden = true;
+        suggestionsList.innerHTML = "";
+        return;
+    }
+
+    suggestionsList.innerHTML = items
+        .map(
+            (item, index) =>
+                `<li data-index="${index}" role="option">${item.label}</li>`
+        )
+        .join("");
+    suggestionsList.hidden = false;
+}
+
+async function fetchCitySuggestions(query) {
+    const response = await fetch(
+        `/astrology/cities/suggest/?q=${encodeURIComponent(query)}`
+    );
+    if (!response.ok) {
+        return [];
+    }
+    const data = await response.json();
+    return data.results || [];
+}
+
+function applySuggestion(index) {
+    const item = suggestionsData[index];
+    if (!item) {
+        return;
+    }
+
+    birthPlaceInput.value = item.value;
+    renderSuggestions([]);
+}
+
+birthPlaceInput.addEventListener("input", async () => {
+    const query = birthPlaceInput.value.trim();
+    clearTimeout(debounceTimer);
+
+    if (query.length < 2) {
+        renderSuggestions([]);
+        return;
+    }
+
+    debounceTimer = setTimeout(async () => {
+        const items = await fetchCitySuggestions(query);
+        renderSuggestions(items);
+    }, 180);
+});
+
+birthPlaceInput.addEventListener("keydown", (event) => {
+    if (suggestionsList.hidden || !suggestionsData.length) {
+        return;
+    }
+
+    if (event.key === "ArrowDown") {
+        event.preventDefault();
+        activeSuggestionIndex =
+            (activeSuggestionIndex + 1) % suggestionsData.length;
+    } else if (event.key === "ArrowUp") {
+        event.preventDefault();
+        activeSuggestionIndex =
+            (activeSuggestionIndex - 1 + suggestionsData.length) %
+            suggestionsData.length;
+    } else if (event.key === "Enter") {
+        if (activeSuggestionIndex >= 0) {
+            event.preventDefault();
+            applySuggestion(activeSuggestionIndex);
+        }
+        return;
+    } else if (event.key === "Escape") {
+        renderSuggestions([]);
+        return;
+    } else {
+        return;
+    }
+
+    const items = suggestionsList.querySelectorAll("li");
+    items.forEach((item) => item.classList.remove("active"));
+    if (items[activeSuggestionIndex]) {
+        items[activeSuggestionIndex].classList.add("active");
+    }
+});
+
+suggestionsList.addEventListener("mousedown", (event) => {
+    const item = event.target.closest("li");
+    if (!item) {
+        return;
+    }
+
+    const index = Number(item.dataset.index);
+    if (Number.isNaN(index)) {
+        return;
+    }
+    applySuggestion(index);
+});
+
+document.addEventListener("click", (event) => {
+    if (
+        !suggestionsList.hidden &&
+        !suggestionsList.contains(event.target) &&
+        event.target !== birthPlaceInput
+    ) {
+        renderSuggestions([]);
+    }
+});
 
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -19,7 +136,7 @@ form.addEventListener("submit", async (event) => {
 
     const birthDate = document.getElementById("birth_date").value;
     const birthTime = document.getElementById("birth_time").value;
-    const birthPlace = document.getElementById("birth_place").value.trim();
+    const birthPlace = birthPlaceInput.value.trim();
 
     let valid = true;
 

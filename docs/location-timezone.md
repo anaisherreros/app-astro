@@ -9,10 +9,11 @@ Resolver `birth_place` de forma local para obtener:
 y convertir fecha/hora local a UTC para el calculo astral.
 
 ## Implementacion Actual
-- Fuente local: `astrology/location/cities_test.csv`
+- Fuente local: `astrology/location/cities_all.csv`
 - Logica principal: `astrology/location/place.py`
   - normalizacion de texto (minusculas, sin tildes, espacios compactados)
   - indice cacheado por `query`
+  - soporte de desambiguacion por pais con formato `ciudad, CC`
   - fallback por inclusion de texto
   - conversion de hora local a UTC con `zoneinfo`
 
