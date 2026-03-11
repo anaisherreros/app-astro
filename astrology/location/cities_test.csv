@@ -1,0 +1,96 @@
+query,city,country_code,latitude,longitude,timezone
+madrid,Madrid,ES,40.4165,-3.70256,Europe/Madrid
+barcelona,Barcelona,ES,41.38879,2.15899,Europe/Madrid
+valencia,Valencia,ES,39.47391,-0.37966,Europe/Madrid
+sevilla,Sevilla,ES,37.38283,-5.97317,Europe/Madrid
+bilbao,Bilbao,ES,43.26271,-2.92528,Europe/Madrid
+malaga,Malaga,ES,36.7213,-4.4214,Europe/Madrid
+zaragoza,Zaragoza,ES,41.6561,-0.8773,Europe/Madrid
+murcia,Murcia,ES,37.987,-1.1307,Europe/Madrid
+palma,Palma,ES,39.5696,2.6502,Europe/Madrid
+valladolid,Valladolid,ES,41.6523,-4.7245,Europe/Madrid
+vigo,Vigo,ES,42.2406,-8.7207,Europe/Madrid
+gijon,Gijon,ES,43.5357,-5.6615,Europe/Madrid
+alicante,Alicante,ES,38.3452,-0.4815,Europe/Madrid
+cordoba,Cordoba,ES,37.8882,-4.7794,Europe/Madrid
+granada,Granada,ES,37.1773,-3.5986,Europe/Madrid
+oviedo,Oviedo,ES,43.3619,-5.8494,Europe/Madrid
+santander,Santander,ES,43.4623,-3.80998,Europe/Madrid
+toledo,Toledo,ES,39.8628,-4.0273,Europe/Madrid
+salamanca,Salamanca,ES,40.9701,-5.6635,Europe/Madrid
+cadiz,Cadiz,ES,36.5271,-6.2886,Europe/Madrid
+buenos aires,Buenos Aires,AR,-34.61315,-58.37723,America/Argentina/Buenos_Aires
+cordoba ar,Cordoba,AR,-31.4135,-64.181,America/Argentina/Cordoba
+rosario,Rosario,AR,-32.9468,-60.6393,America/Argentina/Cordoba
+mendoza,Mendoza,AR,-32.8895,-68.8458,America/Argentina/Mendoza
+la plata,La Plata,AR,-34.9214,-57.9544,America/Argentina/Buenos_Aires
+mar del plata,Mar del Plata,AR,-38.0023,-57.5575,America/Argentina/Buenos_Aires
+salta,Salta,AR,-24.7821,-65.4232,America/Argentina/Salta
+tucuman,San Miguel de Tucuman,AR,-26.8083,-65.2176,America/Argentina/Tucuman
+neuquen,Neuquen,AR,-38.9516,-68.0591,America/Argentina/Salta
+ushuaia,Ushuaia,AR,-54.8019,-68.303,America/Argentina/Ushuaia
+montevideo,Montevideo,UY,-34.90328,-56.18816,America/Montevideo
+punta del este,Punta del Este,UY,-34.9683,-54.949,America/Montevideo
+salto uy,Salto,UY,-31.3833,-57.9667,America/Montevideo
+asuncion,Asuncion,PY,-25.28646,-57.647,America/Asuncion
+ciudad del este,Ciudad del Este,PY,-25.5097,-54.6111,America/Asuncion
+encarnacion,Encarnacion,PY,-27.3306,-55.8667,America/Asuncion
+santiago,Santiago,CL,-33.45694,-70.64827,America/Santiago
+valparaiso,Valparaiso,CL,-33.0472,-71.6127,America/Santiago
+concepcion,Concepcion,CL,-36.827,-73.0498,America/Santiago
+la serena,La Serena,CL,-29.9045,-71.2489,America/Santiago
+antofagasta,Antofagasta,CL,-23.6509,-70.3975,America/Santiago
+temuco,Temuco,CL,-38.7359,-72.5904,America/Santiago
+punta arenas,Punta Arenas,CL,-53.1638,-70.9171,America/Punta_Arenas
+la paz,La Paz,BO,-16.5,-68.15,America/La_Paz
+santa cruz bo,Santa Cruz de la Sierra,BO,-17.7833,-63.1821,America/La_Paz
+cochabamba,Cochabamba,BO,-17.3895,-66.1568,America/La_Paz
+sucre,Sucre,BO,-19.0431,-65.2592,America/La_Paz
+lima,Lima,PE,-12.04318,-77.02824,America/Lima
+arequipa,Arequipa,PE,-16.3989,-71.535,America/Lima
+cusco,Cusco,PE,-13.5319,-71.9675,America/Lima
+trujillo pe,Trujillo,PE,-8.1118,-79.0288,America/Lima
+piura,Piura,PE,-5.1945,-80.6328,America/Lima
+iquitos,Iquitos,PE,-3.7437,-73.2516,America/Lima
+quito,Quito,EC,-0.22985,-78.52495,America/Guayaquil
+guayaquil,Guayaquil,EC,-2.1709,-79.9224,America/Guayaquil
+cuenca ec,Cuenca,EC,-2.9006,-79.0045,America/Guayaquil
+ambato,Ambato,EC,-1.2491,-78.6168,America/Guayaquil
+bogota,Bogota,CO,4.60971,-74.08175,America/Bogota
+medellin,Medellin,CO,6.2442,-75.5812,America/Bogota
+cali,Cali,CO,3.4516,-76.532,America/Bogota
+barranquilla,Barranquilla,CO,10.9639,-74.7964,America/Bogota
+cartagena,Cartagena,CO,10.391,-75.4794,America/Bogota
+bucaramanga,Bucaramanga,CO,7.1193,-73.1227,America/Bogota
+manizales,Manizales,CO,5.0703,-75.5138,America/Bogota
+pereira,Pereira,CO,4.8143,-75.6946,America/Bogota
+maracaibo,Maracaibo,VE,10.6545,-71.6447,America/Caracas
+caracas,Caracas,VE,10.4806,-66.9036,America/Caracas
+valencia ve,Valencia,VE,10.162,-68.0077,America/Caracas
+barquisimeto,Barquisimeto,VE,10.0739,-69.3228,America/Caracas
+barcelona ve,Barcelona,VE,10.1363,-64.6862,America/Caracas
+santo domingo,Santo Domingo,DO,18.4861,-69.9312,America/Santo_Domingo
+santiago do,Santiago de los Caballeros,DO,19.4508,-70.694,America/Santo_Domingo
+san juan,San Juan,PR,18.4655,-66.1057,America/Puerto_Rico
+havana,Havana,CU,23.1136,-82.3666,America/Havana
+santa clara cu,Santa Clara,CU,22.4069,-79.9647,America/Havana
+mexico city,Mexico City,MX,19.42847,-99.12766,America/Mexico_City
+guadalajara,Guadalajara,MX,20.6767,-103.3475,America/Mexico_City
+monterrey,Monterrey,MX,25.6866,-100.3161,America/Monterrey
+puebla,Puebla,MX,19.0414,-98.2063,America/Mexico_City
+tijuana,Tijuana,MX,32.5149,-117.0382,America/Tijuana
+merida mx,Merida,MX,20.9674,-89.5926,America/Merida
+cancun,Cancun,MX,21.1619,-86.8515,America/Cancun
+leon mx,Leon,MX,21.123,-101.68,America/Mexico_City
+queretaro,Queretaro,MX,20.5888,-100.3899,America/Mexico_City
+oaxaca,Oaxaca,MX,17.0732,-96.7266,America/Mexico_City
+san salvador,San Salvador,SV,13.6929,-89.2182,America/El_Salvador
+guatemala city,Guatemala City,GT,14.6349,-90.5069,America/Guatemala
+tegucigalpa,Tegucigalpa,HN,14.0723,-87.1921,America/Tegucigalpa
+managua,Managua,NI,12.114,-86.2362,America/Managua
+san jose,San Jose,CR,9.9281,-84.0907,America/Costa_Rica
+panama city,Panama City,PA,8.9824,-79.5199,America/Panama
+brasilia,Brasilia,BR,-15.7939,-47.8828,America/Sao_Paulo
+sao paulo,Sao Paulo,BR,-23.5505,-46.6333,America/Sao_Paulo
+rio de janeiro,Rio de Janeiro,BR,-22.9068,-43.1729,America/Sao_Paulo
+porto alegre,Porto Alegre,BR,-30.0346,-51.2177,America/Sao_Paulo

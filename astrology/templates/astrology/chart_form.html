@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Calculadora de Carta Natal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+</head>
+<body class="page-center">
+    <div class="card">
+        <h1>Calculadora de carta natal</h1>
+        <p class="subtitle">Introduce tu fecha, hora y lugar de nacimiento y probamos el endpoint.</p>
+
+        <form id="chart-form" novalidate>
+            <div class="field">
+                <label for="birth_date">Fecha de nacimiento</label>
+                <input id="birth_date" name="birth_date" type="date" required />
+                <div class="error" id="error_birth_date"></div>
+            </div>
+
+            <div class="field">
+                <label for="birth_time">Hora de nacimiento</label>
+                <input id="birth_time" name="birth_time" type="time" required />
+                <div class="error" id="error_birth_time"></div>
+            </div>
+
+            <div class="field">
+                <label for="birth_place">Lugar de nacimiento</label>
+                <input id="birth_place" name="birth_place" type="text" placeholder="Ciudad, País" required />
+                <div class="error" id="error_birth_place"></div>
+            </div>
+
+            <div class="button-row">
+                <button type="submit" id="submit-btn">Calcular carta (mock)</button>
+            </div>
+        </form>
+
+        <div id="result" aria-live="polite" hidden>
+            <pre id="result-content"></pre>
+        </div>
+    </div>
+
+    <script src="{% static 'js/astrology/chart_form.js' %}" defer></script>
+</body>
+</html>
+
