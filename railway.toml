@@ -1,0 +1,5 @@
+[build]
+builder = "NIXPACKS"
+
+[build.nixpacksPlan.phases.setup]
+aptPkgs = ["...", "libsqlite3-dev", "gcc", "python3-dev"]
