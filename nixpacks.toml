@@ -1,0 +1,5 @@
+# Solo para despliegue con Nixpacks (p. ej. Railway): imagen mínima sin libsqlite3.so.0.
+# En un VPS con sistema completo esto sobra: borra este archivo y redeploy/build allí.
+# "..." conserva los paquetes apt que Nixpacks ya añade por defecto.
+[phases.setup]
+aptPkgs = ["...", "libsqlite3-0"]
