@@ -1,2 +1,3 @@
 [build]
-nixpacks.pkgs = ["libsqlite3-0", "libsqlite3-dev", "gcc", "python3-dev"]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
