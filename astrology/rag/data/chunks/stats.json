@@ -1,0 +1,55 @@
+{
+  "pdf_dir": "astrology\\rag\\data\\pdf",
+  "output_jsonl": "astrology\\rag\\data\\chunks\\chunks.jsonl",
+  "chunk_config": {
+    "chunk_size": 1200,
+    "overlap": 180,
+    "min_chunk_chars": 220,
+    "skip_first_pages": 3,
+    "max_digit_ratio": 0.25
+  },
+  "total_sources": 5,
+  "total_chunks": 2514,
+  "sources": [
+    {
+      "source_file": "Astrologia de la figura de aspectos-Huber.pdf",
+      "source_title": "Astrologia de la figura de aspectos-Huber",
+      "page_count": 456,
+      "chunk_count": 292,
+      "skipped_first_pages": 3,
+      "skipped_noise_chunks": 477
+    },
+    {
+      "source_file": "Astrologia del Nodo Lunar-Huber.pdf",
+      "source_title": "Astrologia del Nodo Lunar-Huber",
+      "page_count": 339,
+      "chunk_count": 538,
+      "skipped_first_pages": 3,
+      "skipped_noise_chunks": 28
+    },
+    {
+      "source_file": "Las casas astrologicas-Huber.pdf",
+      "source_title": "Las casas astrologicas-Huber",
+      "page_count": 199,
+      "chunk_count": 292,
+      "skipped_first_pages": 3,
+      "skipped_noise_chunks": 34
+    },
+    {
+      "source_file": "Los planetas-Huber.pdf",
+      "source_title": "Los planetas-Huber",
+      "page_count": 443,
+      "chunk_count": 887,
+      "skipped_first_pages": 3,
+      "skipped_noise_chunks": 53
+    },
+    {
+      "source_file": "Los_signos_del_zodiaco.pdf",
+      "source_title": "Los_signos_del_zodiaco",
+      "page_count": 192,
+      "chunk_count": 505,
+      "skipped_first_pages": 3,
+      "skipped_noise_chunks": 4
+    }
+  ]
+}
