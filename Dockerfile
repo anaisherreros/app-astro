@@ -4,7 +4,7 @@ FROM python:3.13-slim
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libsqlite3-0 \
     libsqlite3-dev \
-    gcc \
+    build-essential \
     python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
