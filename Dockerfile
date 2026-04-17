@@ -25,4 +25,5 @@ ENV PYTHONUNBUFFERED=1
 
 # Gunicorn: Railway (y otros) inyectan PORT; por defecto 8000 en local
 ENV PORT=8000
+RUN /opt/venv/bin/python manage.py collectstatic --noinput
 CMD ["/bin/sh", "-c", "exec gunicorn config.wsgi:application --bind 0.0.0.0:${PORT} --workers 4 --timeout 120"]
