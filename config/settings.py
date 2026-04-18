@@ -34,7 +34,23 @@ SECRET_KEY = 'django-insecure-^e3@k)59n@w2)#m*%ysj!!yt1u8-bv+##&2yhj@lglfdwbov5c
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
+_hosts = [h.strip() for h in os.environ.get('ALLOWED_HOSTS', '*').split(',') if h.strip()]
+ALLOWED_HOSTS = _hosts or ['*']
+
+# Railway / reverse proxy (HTTPS)
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# POST con CSRF en HTTPS (formularios Django, admin, etc.):
+# CSRF_TRUSTED_ORIGINS=https://tu-servicio.up.railway.app
+_csrf_origins = os.environ.get('CSRF_TRUSTED_ORIGINS', '')
+CSRF_TRUSTED_ORIGINS = [o.strip() for o in _csrf_origins.split(',') if o.strip()]
+# Railway suele exponer el host publico sin esquema:
+_rail_public = os.environ.get('RAILWAY_PUBLIC_DOMAIN', '').strip()
+if _rail_public and not _rail_public.startswith('http'):
+    _origin = f'https://{_rail_public}'
+    if _origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS = [*CSRF_TRUSTED_ORIGINS, _origin]
 
 
 # Application definition

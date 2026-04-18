@@ -3,6 +3,7 @@ import logging
 
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 
 from .interpretation.readings import generate_astrology_reading_with_usage
@@ -16,6 +17,7 @@ def health(request):
     return JsonResponse({"status": "ok", "app": "astrology"})
 
 
+@ensure_csrf_cookie
 def chart_form(request):
     """
     Vista que solo devuelve la plantilla con el formulario básico.
@@ -52,11 +54,16 @@ def city_suggestions(request):
     return JsonResponse({"results": suggestions})
 
 
+@csrf_exempt
 @require_POST
 def interpretation(request):
     """
     POST JSON: { "chart": <dict calculate_chart>, "nombre": "opcional" }
     Devuelve interpretación completa vía Claude + uso de tokens.
+
+    Sin verificación CSRF: el front solo envía JSON y en HTTPS/proxy (Railway)
+    el token CSRF fallaba con 403. Este endpoint no cambia estado en BD; el
+    riesgo principal es abuso de la API de Anthropic (mitigar con rate limit / auth mas adelante).
     """
     logger.info("interpretation: POST recibido (Content-Length=%s)", request.META.get("CONTENT_LENGTH", "?"))
 

@@ -646,6 +646,7 @@ async function fetchInterpretation(chartPayload, nombre) {
 
     const response = await fetch(ATLAS.interpretation, {
         method: "POST",
+        credentials: "same-origin",
         headers: {
             "Content-Type": "application/json",
             "X-CSRFToken": csrf,
