@@ -8,48 +8,56 @@
     "skip_first_pages": 3,
     "max_digit_ratio": 0.25
   },
-  "total_sources": 5,
-  "total_chunks": 2514,
+  "total_sources": 6,
+  "total_chunks": 81,
   "sources": [
     {
-      "source_file": "Astrologia de la figura de aspectos-Huber.pdf",
-      "source_title": "Astrologia de la figura de aspectos-Huber",
-      "page_count": 456,
-      "chunk_count": 292,
-      "skipped_first_pages": 3,
-      "skipped_noise_chunks": 477
+      "source_file": "sistema_interpretativo_casas_y_signos.md",
+      "source_title": "sistema_interpretativo_casas_y_signos",
+      "page_count": 4,
+      "chunk_count": 19,
+      "skipped_first_pages": 0,
+      "skipped_noise_chunks": 0
     },
     {
-      "source_file": "Astrologia del Nodo Lunar-Huber.pdf",
-      "source_title": "Astrologia del Nodo Lunar-Huber",
-      "page_count": 339,
-      "chunk_count": 538,
-      "skipped_first_pages": 3,
-      "skipped_noise_chunks": 28
+      "source_file": "sistema_interpretativo_jerarquia_de_lectura.md",
+      "source_title": "sistema_interpretativo_jerarquia_de_lectura",
+      "page_count": 5,
+      "chunk_count": 10,
+      "skipped_first_pages": 0,
+      "skipped_noise_chunks": 0
     },
     {
-      "source_file": "Las casas astrologicas-Huber.pdf",
-      "source_title": "Las casas astrologicas-Huber",
-      "page_count": 199,
-      "chunk_count": 292,
-      "skipped_first_pages": 3,
-      "skipped_noise_chunks": 34
+      "source_file": "sistema_interpretativo_nodo_lunar.md",
+      "source_title": "sistema_interpretativo_nodo_lunar",
+      "page_count": 6,
+      "chunk_count": 18,
+      "skipped_first_pages": 0,
+      "skipped_noise_chunks": 0
     },
     {
-      "source_file": "Los planetas-Huber.pdf",
-      "source_title": "Los planetas-Huber",
-      "page_count": 443,
-      "chunk_count": 887,
-      "skipped_first_pages": 3,
-      "skipped_noise_chunks": 53
+      "source_file": "sistema_interpretativo_planetas.md",
+      "source_title": "sistema_interpretativo_planetas",
+      "page_count": 6,
+      "chunk_count": 16,
+      "skipped_first_pages": 0,
+      "skipped_noise_chunks": 0
     },
     {
-      "source_file": "Los_signos_del_zodiaco.pdf",
-      "source_title": "Los_signos_del_zodiaco",
-      "page_count": 192,
-      "chunk_count": 505,
-      "skipped_first_pages": 3,
-      "skipped_noise_chunks": 4
+      "source_file": "sistema_interpretativo_voz_y_tono.md",
+      "source_title": "sistema_interpretativo_voz_y_tono",
+      "page_count": 8,
+      "chunk_count": 9,
+      "skipped_first_pages": 0,
+      "skipped_noise_chunks": 0
+    },
+    {
+      "source_file": "system_prompt_atlas_astral.md",
+      "source_title": "system_prompt_atlas_astral",
+      "page_count": 9,
+      "chunk_count": 9,
+      "skipped_first_pages": 0,
+      "skipped_noise_chunks": 0
     }
   ]
 }

@@ -6,15 +6,8 @@ from dataclasses import dataclass
 from typing import Dict, Iterable, List, Tuple
 
 
-try:
-    from pypdf import PdfReader
-except ImportError as exc:  # pragma: no cover - runtime dependency check
-    raise ImportError(
-        "pypdf is required for PDF chunking. Install with: pip install pypdf"
-    ) from exc
-
-
 WHITESPACE_RE = re.compile(r"\s+")
+MD_H2_SPLIT = re.compile(r"(?m)^## ")
 
 
 @dataclass(frozen=True)
@@ -112,13 +105,23 @@ def _looks_like_noise(chunk_text: str, config: ChunkConfig) -> bool:
     return False
 
 
-def _iter_pdf_files(pdf_dir: str) -> Iterable[str]:
-    for name in sorted(os.listdir(pdf_dir)):
-        if name.lower().endswith(".pdf"):
-            yield os.path.join(pdf_dir, name)
+def _iter_rag_source_files(source_dir: str) -> Iterable[str]:
+    for name in sorted(os.listdir(source_dir)):
+        if name == ".gitkeep" or name.startswith("."):
+            continue
+        lower = name.lower()
+        if lower.endswith(".pdf") or lower.endswith(".md"):
+            yield os.path.join(source_dir, name)
 
 
 def _extract_chunks_from_pdf(pdf_path: str, config: ChunkConfig) -> Tuple[List[Dict], Dict]:
+    try:
+        from pypdf import PdfReader
+    except ImportError as exc:  # pragma: no cover - runtime dependency check
+        raise ImportError(
+            "pypdf is required for PDF chunking. Install with: pip install pypdf"
+        ) from exc
+
     reader = PdfReader(pdf_path)
     source_file = os.path.basename(pdf_path)
     source_title = os.path.splitext(source_file)[0]
@@ -165,6 +168,58 @@ def _extract_chunks_from_pdf(pdf_path: str, config: ChunkConfig) -> Tuple[List[D
     return chunk_rows, stats
 
 
+def _extract_chunks_from_markdown(md_path: str, config: ChunkConfig) -> Tuple[List[Dict], Dict]:
+    with open(md_path, "r", encoding="utf-8") as fh:
+        raw = fh.read()
+    source_file = os.path.basename(md_path)
+    source_title = os.path.splitext(source_file)[0]
+    chunk_rows: List[Dict] = []
+    skipped_noise = 0
+
+    parts = [p.strip() for p in MD_H2_SPLIT.split(raw) if p.strip()]
+    if not parts:
+        return [], {
+            "source_file": source_file,
+            "source_title": source_title,
+            "page_count": 0,
+            "chunk_count": 0,
+            "skipped_first_pages": 0,
+            "skipped_noise_chunks": 0,
+        }
+
+    for sec_i, section_text in enumerate(parts, start=1):
+        text = _normalize_spaces(section_text)
+        if not text:
+            continue
+        for local_idx, chunk_text in enumerate(_split_text(text, config), start=1):
+            if _looks_like_noise(chunk_text, config):
+                skipped_noise += 1
+                continue
+            chunk_id = f"{source_title}__s{sec_i:03d}__c{local_idx:02d}"
+            chunk_rows.append(
+                {
+                    "chunk_id": chunk_id,
+                    "source_file": source_file,
+                    "source_title": source_title,
+                    "page_start": sec_i,
+                    "page_end": sec_i,
+                    "text": chunk_text,
+                    "text_index": _normalize_for_index(chunk_text),
+                    "char_count": len(chunk_text),
+                }
+            )
+
+    stats = {
+        "source_file": source_file,
+        "source_title": source_title,
+        "page_count": len(parts),
+        "chunk_count": len(chunk_rows),
+        "skipped_first_pages": 0,
+        "skipped_noise_chunks": skipped_noise,
+    }
+    return chunk_rows, stats
+
+
 def build_chunks(
     pdf_dir: str,
     output_jsonl: str,
@@ -178,8 +233,11 @@ def build_chunks(
     all_chunks: List[Dict] = []
     source_stats: List[Dict] = []
 
-    for pdf_path in _iter_pdf_files(pdf_dir):
-        rows, stats = _extract_chunks_from_pdf(pdf_path, cfg)
+    for src_path in _iter_rag_source_files(pdf_dir):
+        if src_path.lower().endswith(".pdf"):
+            rows, stats = _extract_chunks_from_pdf(src_path, cfg)
+        else:
+            rows, stats = _extract_chunks_from_markdown(src_path, cfg)
         all_chunks.extend(rows)
         source_stats.append(stats)
 

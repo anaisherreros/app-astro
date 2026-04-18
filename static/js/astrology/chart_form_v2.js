@@ -1,3 +1,10 @@
+/** Rutas API (sobrescribir desde plantilla con window.ATLAS_URLS). */
+const ATLAS = window.ATLAS_URLS || {
+    chart: "/astrology/chart/",
+    interpretation: "/astrology/interpretation/",
+    citiesSuggest: "/astrology/cities/suggest/",
+};
+
 const form = document.getElementById("chart-form");
 const submitBtn = document.getElementById("submit-btn");
 const birthPlaceInput = document.getElementById("birth_place");
@@ -158,6 +165,15 @@ function normalizeSign(sign) {
     };
 }
 
+function getCsrfToken() {
+    const input = document.querySelector("[name=csrfmiddlewaretoken]");
+    if (input && input.value) {
+        return input.value;
+    }
+    const match = document.cookie.match(/csrftoken=([^;]+)/);
+    return match ? decodeURIComponent(match[1]) : "";
+}
+
 function escapeHtml(value) {
     return String(value ?? "")
         .replace(/&/g, "&amp;")
@@ -201,7 +217,9 @@ function renderSuggestions(items) {
 }
 
 async function fetchCitySuggestions(query) {
-    const response = await fetch(`/astrology/cities/suggest/?q=${encodeURIComponent(query)}`);
+    const response = await fetch(
+        `${ATLAS.citiesSuggest}?q=${encodeURIComponent(query)}`,
+    );
     if (!response.ok) {
         return [];
     }
@@ -430,11 +448,7 @@ function buildStep1DebugData(originalData, step1) {
     };
 }
 
-function renderInterpretationStep1(step1) {
-    if (!interpretationCards) {
-        return;
-    }
-
+function interpretationStep1Html(step1) {
     const positionList = step1.facts.positions
         .map((fact) => `<li>${escapeHtml(fact.text_display)}</li>`)
         .join("");
@@ -445,10 +459,10 @@ function renderInterpretationStep1(step1) {
         .map((fact) => `<li>${escapeHtml(fact.text_display)}</li>`)
         .join("");
 
-    interpretationCards.innerHTML = `
-        <article class="card-surface-navy interpret-block p-5">
-            <h3>Paso 1: JSON a texto estructurado</h3>
-            <p class="intro">Este bloque muestra la conversión inicial de la carta a hechos en español, listos para deduplicación y búsqueda RAG.</p>
+    return `
+        <article class="card-surface interpret-block interpret-facts-card p-5">
+            <h3>Hechos estructurados (sin IA)</h3>
+            <p class="intro">Resumen automatico de la carta en texto, por si la interpretacion con IA no esta disponible.</p>
 
             <h4>Posiciones</h4>
             <ul class="list-disc space-y-1">${positionList || "<li>Sin datos de posiciones.</li>"}</ul>
@@ -460,6 +474,13 @@ function renderInterpretationStep1(step1) {
             <ul class="list-disc space-y-1">${unaspectedList || "<li>Sin planetas inaspectados.</li>"}</ul>
         </article>
     `;
+}
+
+function renderInterpretationStep1(step1) {
+    if (!interpretationCards) {
+        return;
+    }
+    interpretationCards.innerHTML = interpretationStep1Html(step1);
 }
 
 function renderPlanetsCards(result) {
@@ -552,13 +573,121 @@ function renderRawJson(data) {
     resultContent.textContent = JSON.stringify(data, null, 2);
 }
 
-function renderAll(data) {
+function renderChartVisuals(data) {
     const result = getResultPayload(data);
     const step1 = buildStep1Payload(result);
-    renderInterpretationStep1(step1);
     renderPlanetsCards(result);
     renderAspectsTable(result);
     renderRawJson(buildStep1DebugData(data, step1));
+    return { result, step1 };
+}
+
+function renderInterpretationLoading() {
+    if (!interpretationCards) {
+        return;
+    }
+    interpretationCards.innerHTML = `
+        <article class="card-surface-gray p-4">
+            <p class="body-copy text-primary">Carta calculada. Generando interpretacion con IA (puede tardar un minuto)...</p>
+        </article>
+    `;
+}
+
+function renderInterpretationFromLLM(text, inputTokens, outputTokens) {
+    if (!interpretationCards) {
+        return;
+    }
+    const safe = (text || "").trim();
+    if (!safe) {
+        interpretationCards.innerHTML = `
+            <article class="card-surface-gray p-4">
+                <p class="text-error">La IA devolvio un texto vacio. Revisa logs del servidor y la respuesta en la pestana Detalles.</p>
+            </article>
+        `;
+        return;
+    }
+    const body = escapeHtml(safe).replace(/\n/g, "<br />");
+    const meta =
+        inputTokens != null && outputTokens != null
+            ? `<p class="text-muted mt-3 text-sm">Tokens: entrada ${inputTokens} · salida ${outputTokens}</p>`
+            : "";
+    interpretationCards.innerHTML = `
+        <article class="card-surface interpret-block interpret-llm-card p-5">
+            <h3>Interpretacion</h3>
+            <div class="body-copy mt-3 interpret-llm-text">${body}</div>
+            ${meta}
+        </article>
+    `;
+}
+
+function renderInterpretationError(message, step1) {
+    if (!interpretationCards) {
+        return;
+    }
+    const errBlock = `
+        <article class="card-surface-gray p-4">
+            <p class="text-error">No se pudo generar la interpretacion con IA: ${escapeHtml(message)}</p>
+            <p class="body-copy mt-2 text-sm text-muted">Comprueba ANTHROPIC_API_KEY en el servidor y tu conexion. Mientras tanto puedes revisar planetas y aspectos en las otras pestanas.</p>
+        </article>
+    `;
+    const fallback = step1 != null ? interpretationStep1Html(step1) : "";
+    interpretationCards.innerHTML = `${errBlock}${fallback}`;
+}
+
+async function fetchInterpretation(chartPayload, nombre) {
+    const csrf = getCsrfToken();
+    if (!csrf) {
+        console.warn(
+            "[Atlas interpretation] No hay token CSRF (csrftoken). ¿Falta {% csrf_token %} en el formulario?",
+        );
+    }
+
+    console.info("[Atlas interpretation] Enviando POST %s …", ATLAS.interpretation);
+
+    const response = await fetch(ATLAS.interpretation, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrf,
+        },
+        body: JSON.stringify({
+            chart: chartPayload,
+            nombre: nombre || null,
+        }),
+    });
+
+    const rawText = await response.text();
+    let payload;
+    try {
+        payload = JSON.parse(rawText);
+    } catch (e) {
+        console.error(
+            "[Atlas interpretation] Respuesta no JSON (status %s). Primeros 400 caracteres:\n%s",
+            response.status,
+            rawText.slice(0, 400),
+        );
+        throw new Error(
+            `El servidor no devolvio JSON (HTTP ${response.status}). Revisa la consola del servidor (runserver / Railway logs).`,
+        );
+    }
+
+    if (!response.ok || payload.error) {
+        console.error("[Atlas interpretation] Error API:", response.status, payload);
+        const detail = payload.traceback ? `${payload.error}\n(ver traceback en logs servidor)` : payload.error;
+        throw new Error(detail || `HTTP ${response.status}`);
+    }
+
+    if (typeof payload.interpretation !== "string") {
+        console.error("[Atlas interpretation] Respuesta sin campo interpretation:", payload);
+        throw new Error("El servidor no devolvio texto de interpretacion.");
+    }
+
+    console.info(
+        "[Atlas interpretation] OK (input_tokens=%s output_tokens=%s)",
+        payload.input_tokens,
+        payload.output_tokens,
+    );
+    return payload;
 }
 
 function showResults() {
@@ -633,13 +762,26 @@ form.addEventListener("submit", async (event) => {
             birth_place: birthPlace,
         });
 
-        const response = await fetch(`/astrology/chart/?${params.toString()}`);
+        const response = await fetch(`${ATLAS.chart}?${params.toString()}`);
         const data = await response.json();
         if (!response.ok || data.error) {
             throw new Error(data.error || "No se pudo calcular la carta.");
         }
 
-        renderAll(data);
+        const { result, step1 } = renderChartVisuals(data);
+        const fullName = document.getElementById("full_name")?.value?.trim() || "";
+
+        renderInterpretationLoading();
+        try {
+            const llm = await fetchInterpretation(result, fullName);
+            renderInterpretationFromLLM(
+                llm.interpretation,
+                llm.input_tokens,
+                llm.output_tokens,
+            );
+        } catch (interpretError) {
+            renderInterpretationError(interpretError.message, step1);
+        }
     } catch (error) {
         interpretationCards.innerHTML = `
             <article class="card-surface-gray p-4">

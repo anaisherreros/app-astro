@@ -563,6 +563,29 @@
     background: rgba(138, 140, 142, 0.1);
 }
 
+.interpret-llm-text {
+    white-space: pre-wrap;
+    line-height: 1.65;
+}
+
+/* Interpretacion IA: fondo claro y texto oscuro (lectura larga) */
+.interpret-llm-card {
+    color: var(--color-text-primary);
+}
+
+.interpret-llm-card h3 {
+    color: var(--color-text-primary);
+}
+
+.interpret-llm-card .interpret-llm-text {
+    color: var(--color-text-secondary);
+    font-size: var(--text-base);
+}
+
+.interpret-llm-card .text-muted {
+    color: var(--color-text-muted);
+}
+
 .interpret-block h3 {
     font-family: var(--font-title);
     font-size: var(--text-md);
@@ -605,17 +628,30 @@
     color: var(--color-text-secondary);
 }
 
+/* Mismo nodo (article.card-surface-navy.interpret-block) o anidado */
+.card-surface-navy.interpret-block h3,
+.card-surface-navy.interpret-block h4,
 .card-surface-navy .interpret-block h3,
 .card-surface-navy .interpret-block h4 {
     color: var(--color-text-light);
 }
 
+.card-surface-navy.interpret-block .intro,
+.card-surface-navy.interpret-block ul,
 .card-surface-navy .interpret-block .intro,
 .card-surface-navy .interpret-block ul {
     color: rgba(255, 255, 255, 0.88);
     line-height: var(--leading-body);
 }
 
+.card-surface-navy.interpret-block .interpret-llm-text,
+.card-surface-navy.interpret-block .body-copy,
+.card-surface-navy .interpret-block .interpret-llm-text,
+.card-surface-navy .interpret-block .body-copy {
+    color: rgba(255, 255, 255, 0.92);
+}
+
+.card-surface-navy.interpret-block ul li::marker,
 .card-surface-navy .interpret-block ul li::marker {
     color: var(--color-text-blue-soft);
 }
@@ -673,4 +709,44 @@
 input[type="date"]::-webkit-calendar-picker-indicator,
 input[type="time"]::-webkit-calendar-picker-indicator {
     opacity: 0;
+}
+
+/*
+ * Interpretación: forzar contraste dentro de #interpretation-cards.
+ * Evita que reglas genericas (.interpret-block h3, Tailwind, etc.) dejen texto oscuro sobre fondo azul o viceversa.
+ */
+#interpretation-cards .interpret-llm-card {
+    background: var(--color-bg-card) !important;
+    border: 1px solid var(--color-border) !important;
+    color: var(--color-text-primary) !important;
+}
+
+#interpretation-cards .interpret-llm-card h3 {
+    color: var(--color-text-primary) !important;
+}
+
+#interpretation-cards .interpret-llm-card .interpret-llm-text,
+#interpretation-cards .interpret-llm-card .body-copy.interpret-llm-text {
+    color: var(--color-text-secondary) !important;
+}
+
+#interpretation-cards .interpret-llm-card .text-muted {
+    color: var(--color-text-muted) !important;
+}
+
+#interpretation-cards .interpret-facts-card {
+    background: var(--color-bg-card) !important;
+    border: 1px solid var(--color-border) !important;
+    color: var(--color-text-primary) !important;
+}
+
+#interpretation-cards .interpret-facts-card h3,
+#interpretation-cards .interpret-facts-card h4 {
+    color: var(--color-text-primary) !important;
+}
+
+#interpretation-cards .interpret-facts-card .intro,
+#interpretation-cards .interpret-facts-card ul,
+#interpretation-cards .interpret-facts-card li {
+    color: var(--color-text-secondary) !important;
 }
