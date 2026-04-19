@@ -345,7 +345,10 @@ function renderSuggestions(items) {
     }
 
     suggestionsList.innerHTML = items
-        .map((item, index) => `<li data-index="${index}" role="option">${escapeHtml(item.label)}</li>`)
+        .map(
+            (item, index) =>
+                `<li class="city-dropdown-item" data-index="${index}" role="option">${escapeHtml(item.label)}</li>`,
+        )
         .join("");
     suggestionsList.hidden = false;
 }

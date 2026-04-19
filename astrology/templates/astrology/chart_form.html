@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;1,14..32,400&display=swap" rel="stylesheet" />
     <script src="{% static 'js/astrology/tailwind_config.js' %}"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="{% static 'css/astrology/chart_form.css' %}?v=20" />
+    <link rel="stylesheet" href="{% static 'css/astrology/chart_form.css' %}?v=22" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css" />
     <script>
         window.ATLAS_URLS = {
@@ -89,16 +89,18 @@
 
                     <div class="form-field form-field--suggest">
                         <label class="sr-only" for="birth_place">Ciudad de nacimiento</label>
-                        <div class="form-input-shell">
-                            <input id="birth_place" name="birth_place" type="text" placeholder="Ciudad de nacimiento" autocomplete="off" required class="form-input" />
-                            <span class="form-input-suffix-icon" aria-hidden="true">
-                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 21s-6-5.33-6-10a6 6 0 1 1 12 0c0 4.67-6 10-6 10Z"></path>
-                                    <circle cx="12" cy="11" r="2"></circle>
-                                </svg>
-                            </span>
+                        <div class="form-suggest-wrap">
+                            <div class="form-input-shell">
+                                <input id="birth_place" name="birth_place" type="text" placeholder="Ciudad de nacimiento" autocomplete="off" required class="form-input" />
+                                <span class="form-input-suffix-icon" aria-hidden="true">
+                                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 21s-6-5.33-6-10a6 6 0 1 1 12 0c0 4.67-6 10-6 10Z"></path>
+                                        <circle cx="12" cy="11" r="2"></circle>
+                                    </svg>
+                                </span>
+                            </div>
+                            <ul id="city-suggestions" class="city-dropdown" role="listbox" hidden></ul>
                         </div>
-                        <ul id="city-suggestions" class="city-suggestions" role="listbox" hidden></ul>
                         <p class="field-error" id="error_birth_place"></p>
                     </div>
 
