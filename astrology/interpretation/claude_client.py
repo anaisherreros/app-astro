@@ -62,9 +62,10 @@ def call_claude_sonnet(
         input_tokens=message.usage.input_tokens,
         output_tokens=message.usage.output_tokens,
     )
-    print(
-        f"[Claude] input_tokens={usage.input_tokens} "
-        f"output_tokens={usage.output_tokens}"
+    logger.info(
+        "Claude usage: input_tokens=%s output_tokens=%s",
+        usage.input_tokens,
+        usage.output_tokens,
     )
 
     text_parts: list[str] = []
