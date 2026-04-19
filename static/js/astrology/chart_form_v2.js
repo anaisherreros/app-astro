@@ -7,6 +7,7 @@ const ATLAS = window.ATLAS_URLS || {
 
 const form = document.getElementById("chart-form");
 const submitBtn = document.getElementById("submit-btn");
+const submitBtnLabel = document.getElementById("submit-btn-label");
 const birthPlaceInput = document.getElementById("birth_place");
 const suggestionsList = document.getElementById("city-suggestions");
 
@@ -20,6 +21,7 @@ const aspectsTableBody = document.getElementById("aspects-table-body");
 
 const resultBox = document.getElementById("result");
 const resultContent = document.getElementById("result-content");
+/** JSON crudo: solo en la pestaña Planetas (bloque colapsable). */
 const DEBUG_SHOW_RAW_JSON = true;
 
 let suggestionsData = [];
@@ -183,6 +185,138 @@ function escapeHtml(value) {
         .replace(/'/g, "&#039;");
 }
 
+let markedOptionsApplied = false;
+
+function configureMarkedParser() {
+    if (markedOptionsApplied || typeof marked === "undefined") {
+        return;
+    }
+    const m = marked;
+    if (typeof m.setOptions === "function") {
+        m.setOptions({
+            gfm: true,
+            breaks: false,
+            mangle: false,
+            headerIds: false,
+        });
+    }
+    markedOptionsApplied = true;
+}
+
+function stripLeadingInterpretacionHeading(markdown) {
+    const lines = String(markdown ?? "").replace(/\r\n/g, "\n").split("\n");
+    while (lines.length) {
+        const first = lines[0].trim();
+        if (!first) {
+            lines.shift();
+            continue;
+        }
+        if (/^(#{1,6}\s*)?Interpretación\s*$/i.test(first)) {
+            lines.shift();
+            continue;
+        }
+        break;
+    }
+    return lines.join("\n").trim();
+}
+
+function parseMarkdownToHtml(markdown) {
+    configureMarkedParser();
+    const md = stripLeadingInterpretacionHeading(String(markdown ?? "").trim().replace(/\r\n/g, "\n"));
+    if (!md) {
+        return "";
+    }
+    const parse =
+        typeof marked !== "undefined" && typeof marked.parse === "function"
+            ? (src) => marked.parse(src)
+            : typeof marked !== "undefined" && typeof marked === "function"
+              ? (src) => marked(src)
+              : null;
+    if (!parse) {
+        return escapeHtml(md).replace(/\n/g, "<br />");
+    }
+    const sep = "\n---\n";
+    const idx = md.lastIndexOf(sep);
+    let rawHtml;
+    if (idx !== -1) {
+        const mainMd = stripLeadingInterpretacionHeading(md.slice(0, idx).trim());
+        const synMd = stripLeadingInterpretacionHeading(md.slice(idx + sep.length).trim());
+        rawHtml =
+            parse(mainMd) +
+            (synMd ? `<div class="synthesis">${parse(synMd)}</div>` : "");
+    } else {
+        rawHtml = parse(md);
+    }
+    if (typeof DOMPurify !== "undefined" && typeof DOMPurify.sanitize === "function") {
+        try {
+            return DOMPurify.sanitize(rawHtml, { USE_PROFILES: { html: true } });
+        } catch {
+            return DOMPurify.sanitize(rawHtml);
+        }
+    }
+    return rawHtml;
+}
+
+/** Orden: primera coincidencia gana (títulos tipo "Figura…" antes que "Sol…"). */
+const INTERPRETATION_H2_ICON_ENTRIES = [
+    ["figura", "✦"],
+    ["sol", "☉"],
+    ["luna", "☽"],
+    ["saturno", "♄"],
+    ["ascendente", "↑"],
+    ["recorrido de casas", "✺"],
+    ["casas", "⌂"],
+    ["nodo", "☊"],
+    ["sintesis", "◈"],
+];
+
+function normalizeInterpretationH2MatchText(s) {
+    return String(s ?? "")
+        .normalize("NFD")
+        .replace(/\p{M}/gu, "")
+        .toLowerCase();
+}
+
+function interpretationH2IconForPlainText(plain) {
+    const hay = normalizeInterpretationH2MatchText(plain);
+    for (const [key, symbol] of INTERPRETATION_H2_ICON_ENTRIES) {
+        const esc = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const re = new RegExp(`\\b${esc}\\b`, "i");
+        if (re.test(hay)) {
+            return symbol;
+        }
+    }
+    return null;
+}
+
+/**
+ * Tras el markdown: icono dorado delante de cada h2 según el texto (no en `.synthesis`).
+ */
+function decorateInterpretationH2Icons(root) {
+    if (!root || typeof root.querySelectorAll !== "function") {
+        return;
+    }
+    const headings = root.querySelectorAll("h2");
+    headings.forEach((h2) => {
+        if (h2.closest(".synthesis")) {
+            return;
+        }
+        if (h2.querySelector(":scope > .interpret-h2-icon")) {
+            return;
+        }
+        const plain = h2.textContent || "";
+        const icon = interpretationH2IconForPlainText(plain);
+        if (!icon) {
+            return;
+        }
+        const span = document.createElement("span");
+        span.className = "interpret-h2-icon";
+        span.setAttribute("aria-hidden", "true");
+        span.textContent = icon;
+        h2.insertBefore(span, h2.firstChild);
+    });
+}
+
 function getResultPayload(data) {
     // Accept payloads like:
     // {result:{...}} or {result:{result:{...}}} or {...}
@@ -313,14 +447,30 @@ function setupTabs() {
 }
 
 function setActiveTab(tabName) {
+    const known = new Set(
+        Array.from(resultTabs).map((btn) => btn.dataset.tab).filter(Boolean),
+    );
+    const resolved = known.has(tabName) ? tabName : "interpretation";
     resultTabs.forEach((btn) => {
-        btn.setAttribute("aria-selected", btn.dataset.tab === tabName ? "true" : "false");
+        btn.setAttribute("aria-selected", btn.dataset.tab === resolved ? "true" : "false");
     });
     resultPanels.forEach((panel) => {
-        const isActive = panel.dataset.panel === tabName;
+        const isActive = panel.dataset.panel === resolved;
         panel.hidden = !isActive;
         panel.classList.toggle("hidden", !isActive);
     });
+}
+
+function syncResultsChartCaption() {
+    const cap = document.getElementById("results-chart-caption");
+    const textEl = document.getElementById("results-chart-caption-text");
+    if (!cap || !textEl) {
+        return;
+    }
+    const name = document.getElementById("full_name")?.value?.trim() || "";
+    const line = name ? `Carta natal de ${name}` : "Carta natal";
+    textEl.textContent = line.toLocaleUpperCase("es");
+    cap.hidden = false;
 }
 
 function getPlanetRows(result) {
@@ -460,9 +610,9 @@ function interpretationStep1Html(step1) {
         .join("");
 
     return `
-        <article class="card-surface interpret-block interpret-facts-card p-5">
-            <h3>Hechos estructurados (sin IA)</h3>
-            <p class="intro">Resumen automatico de la carta en texto, por si la interpretacion con IA no esta disponible.</p>
+        <article class="card-surface interpret-block interpret-facts-card p-1">
+            <h3>Hechos estructurados</h3>
+            <p class="intro">Resumen automático de la carta en texto, por si la interpretación principal no está disponible.</p>
 
             <h4>Posiciones</h4>
             <ul class="list-disc space-y-1">${positionList || "<li>Sin datos de posiciones.</li>"}</ul>
@@ -564,6 +714,9 @@ function renderAspectsTable(result) {
 }
 
 function renderRawJson(data) {
+    if (!resultBox || !resultContent) {
+        return;
+    }
     if (!DEBUG_SHOW_RAW_JSON) {
         resultBox.hidden = true;
         resultContent.textContent = "";
@@ -587,8 +740,8 @@ function renderInterpretationLoading() {
         return;
     }
     interpretationCards.innerHTML = `
-        <article class="card-surface-gray p-4">
-            <p class="body-copy text-primary">Carta calculada. Generando interpretacion con IA (puede tardar un minuto)...</p>
+        <article class="card-surface-gray p-1">
+            <p class="body-copy text-primary">Carta calculada. Redactando la interpretación (puede tardar un minuto)…</p>
         </article>
     `;
 }
@@ -600,24 +753,28 @@ function renderInterpretationFromLLM(text, inputTokens, outputTokens) {
     const safe = (text || "").trim();
     if (!safe) {
         interpretationCards.innerHTML = `
-            <article class="card-surface-gray p-4">
-                <p class="text-error">La IA devolvio un texto vacio. Revisa logs del servidor y la respuesta en la pestana Detalles.</p>
+            <article class="card-surface-gray p-1">
+                <p class="text-error">No se recibió texto de interpretación. Revisa los logs del servidor; si activaste el JSON técnico, estará en la pestaña Planetas.</p>
             </article>
         `;
         return;
     }
-    const body = escapeHtml(safe).replace(/\n/g, "<br />");
-    const meta =
-        inputTokens != null && outputTokens != null
-            ? `<p class="text-muted mt-3 text-sm">Tokens: entrada ${inputTokens} · salida ${outputTokens}</p>`
-            : "";
+    const bodyHtml = parseMarkdownToHtml(safe);
+    if (inputTokens != null && outputTokens != null) {
+        console.info("[Atlas interpretation] tokens", {
+            input_tokens: inputTokens,
+            output_tokens: outputTokens,
+        });
+    }
     interpretationCards.innerHTML = `
-        <article class="card-surface interpret-block interpret-llm-card p-5">
-            <h3>Interpretacion</h3>
-            <div class="body-copy mt-3 interpret-llm-text">${body}</div>
-            ${meta}
+        <article class="card-surface interpret-block interpret-llm-card">
+            <div id="interpretation" class="interpret-llm-body">${bodyHtml}</div>
         </article>
     `;
+    const interpretRoot = document.getElementById("interpretation");
+    if (interpretRoot) {
+        decorateInterpretationH2Icons(interpretRoot);
+    }
 }
 
 function renderInterpretationError(message, step1) {
@@ -625,9 +782,9 @@ function renderInterpretationError(message, step1) {
         return;
     }
     const errBlock = `
-        <article class="card-surface-gray p-4">
-            <p class="text-error">No se pudo generar la interpretacion con IA: ${escapeHtml(message)}</p>
-            <p class="body-copy mt-2 text-sm text-muted">Comprueba ANTHROPIC_API_KEY en el servidor y tu conexion. Mientras tanto puedes revisar planetas y aspectos en las otras pestanas.</p>
+        <article class="card-surface-gray p-1">
+            <p class="text-error">No se pudo generar la interpretación: ${escapeHtml(message)}</p>
+            <p class="body-copy mt-2 text-sm text-muted">Comprueba ANTHROPIC_API_KEY en el servidor y tu conexión. Mientras tanto puedes revisar planetas y aspectos en las otras pestañas.</p>
         </article>
     `;
     const fallback = step1 != null ? interpretationStep1Html(step1) : "";
@@ -680,7 +837,7 @@ async function fetchInterpretation(chartPayload, nombre) {
 
     if (typeof payload.interpretation !== "string") {
         console.error("[Atlas interpretation] Respuesta sin campo interpretation:", payload);
-        throw new Error("El servidor no devolvio texto de interpretacion.");
+        throw new Error("El servidor no devolvió texto de interpretación.");
     }
 
     console.info(
@@ -694,9 +851,14 @@ async function fetchInterpretation(chartPayload, nombre) {
 function showResults() {
     resultsShell.classList.remove("hidden");
     resultsShell.hidden = false;
+    syncResultsChartCaption();
 }
 
 function hideResults() {
+    const cap = document.getElementById("results-chart-caption");
+    if (cap) {
+        cap.hidden = true;
+    }
     resultsShell.classList.add("hidden");
     resultsShell.hidden = true;
 }
@@ -714,7 +876,8 @@ form.addEventListener("submit", async (event) => {
     setError("birth_place", "");
 
     const birthDate = document.getElementById("birth_date").value;
-    const birthTime = document.getElementById("birth_time").value;
+    const birthTimeRaw = document.getElementById("birth_time").value;
+    const birthTime = birthTimeRaw.length > 5 ? birthTimeRaw.slice(0, 5) : birthTimeRaw;
     const birthPlace = birthPlaceInput.value.trim();
 
     let valid = true;
@@ -738,7 +901,7 @@ form.addEventListener("submit", async (event) => {
     showResults();
     setActiveTab("interpretation");
     interpretationCards.innerHTML = `
-        <article class="card-surface-gray p-4">
+        <article class="card-surface-gray p-1">
             <p class="body-copy text-primary">Calculando carta...</p>
         </article>
     `;
@@ -754,7 +917,11 @@ form.addEventListener("submit", async (event) => {
     `;
 
     submitBtn.disabled = true;
-    submitBtn.textContent = "Calculando...";
+    if (submitBtnLabel) {
+        submitBtnLabel.textContent = "Calculando...";
+    } else {
+        submitBtn.textContent = "Calculando...";
+    }
 
     try {
         const params = new URLSearchParams({
@@ -785,7 +952,7 @@ form.addEventListener("submit", async (event) => {
         }
     } catch (error) {
         interpretationCards.innerHTML = `
-            <article class="card-surface-gray p-4">
+            <article class="card-surface-gray p-1">
                 <p class="text-error">Error al calcular la carta: ${escapeHtml(error.message)}</p>
             </article>
         `;
@@ -801,10 +968,18 @@ form.addEventListener("submit", async (event) => {
                 <td colspan="4" class="py-3 text-error">Sin datos de aspectos por error de calculo.</td>
             </tr>
         `;
-        resultBox.hidden = false;
-        resultContent.textContent = "Error al calcular la carta: " + error.message;
+        if (resultBox) {
+            resultBox.hidden = true;
+        }
+        if (resultContent) {
+            resultContent.textContent = "";
+        }
     } finally {
         submitBtn.disabled = false;
-        submitBtn.textContent = "Calcular carta";
+        if (submitBtnLabel) {
+            submitBtnLabel.textContent = "Calcular mi carta";
+        } else {
+            submitBtn.textContent = "Calcular mi carta";
+        }
     }
 });

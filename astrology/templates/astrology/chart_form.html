@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;1,14..32,400&display=swap" rel="stylesheet" />
     <script src="{% static 'js/astrology/tailwind_config.js' %}"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="{% static 'css/astrology/chart_form.css' %}?v=2" />
+    <link rel="stylesheet" href="{% static 'css/astrology/chart_form.css' %}?v=19" />
     <script>
         window.ATLAS_URLS = {
             chart: "{% url 'astrology-chart' %}",
@@ -20,80 +20,62 @@
     </script>
 </head>
 <body class="app-body min-h-screen">
-    <header class="app-header px-5 py-4 sm:px-8">
-        <div class="relative mx-auto flex max-w-[1200px] items-center justify-center gap-3">
+    <header class="brand-header px-5 py-4 sm:px-8 sm:py-5">
+        <div class="brand-lockup mx-auto max-w-[1200px]">
             <p class="brand-text">ATLAS</p>
-            <span class="logo-gold-ring">
-                <img src="{% static 'img/logo.png' %}" alt="Codigo LOGO Astral" />
+            <span class="logo-brand">
+                <img src="{% static 'img/logo.png' %}" alt="Logo Atlas Astral" />
             </span>
             <p class="brand-text">ASTRAL</p>
-            <button type="button" class="menu-btn absolute right-0 top-1/2 -translate-y-1/2" aria-label="Abrir menu">
-                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="4" y1="6" x2="20" y2="6"></line>
-                    <line x1="4" y1="12" x2="20" y2="12"></line>
-                    <line x1="4" y1="18" x2="20" y2="18"></line>
-                </svg>
-            </button>
         </div>
     </header>
 
     <main class="w-full">
-        <div class="mx-auto max-w-[1200px] px-4 py-8 sm:px-8 sm:py-12">
+        <div class="chart-main-inner mx-auto max-w-[1200px] px-4 sm:px-8">
             <div class="text-center">
                 <p class="section-label">Carta natal</p>
-                <h1 class="hero-title mt-2">Descubre tu carta natal</h1>
-                <div class="mx-auto mt-3 flex max-w-lg items-center justify-center gap-3 px-4">
-                    <span class="gold-divider" aria-hidden="true"></span>
-                    <p class="section-label">Desde la astrologia psicologica</p>
-                    <span class="gold-divider" aria-hidden="true"></span>
-                </div>
-                <p class="body-copy mx-auto mt-4 max-w-xl">Introduce tus datos de nacimiento y obten una primera interpretacion.</p>
+                <h1 class="hero-title mt-1.5">Descubre tu carta natal</h1>
+                <p class="body-copy hero-lead mx-auto mt-3 max-w-xl">Introduce fecha, hora y lugar de nacimiento y obtén una primera interpretación con enfoque de astrología psicológica.</p>
             </div>
 
-            <div class="form-card mx-auto mt-8 w-full max-w-2xl">
-                <form id="chart-form" class="space-y-3" novalidate>
+            <div class="form-card mx-auto mt-6 w-full max-w-2xl">
+                <form id="chart-form" class="chart-form-stack" novalidate>
                     {% csrf_token %}
-                    <div>
-                        <label for="full_name" class="sr-only">Nombre (opcional)</label>
-                        <input id="full_name" name="full_name" type="text" placeholder="Nombre (opcional)" class="form-input px-4 pr-4" />
+                    <div class="form-field">
+                        <label class="sr-only" for="full_name">Nombre (opcional)</label>
+                        <div class="form-input-shell">
+                            <input id="full_name" name="full_name" type="text" placeholder="Nombre (opcional)" autocomplete="name" class="form-input" />
+                            <span class="form-input-suffix-icon" aria-hidden="true">
+                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                            </span>
+                        </div>
                     </div>
 
-                    <div class="grid gap-3 sm:grid-cols-2">
-                        <div>
-                            <label for="birth_date" class="sr-only">Fecha de nacimiento</label>
-                            <div class="relative">
-                                <input id="birth_date" name="birth_date" type="date" required class="form-input px-4 pr-10" />
-                                <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center form-input-icon" aria-hidden="true">
-                                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-                                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                                    </svg>
-                                </span>
+                    <div class="form-field-row">
+                        <div class="form-field">
+                            <label class="sr-only" for="birth_date">Fecha de nacimiento</label>
+                            <div class="form-input-shell">
+                                <input id="birth_date" name="birth_date" type="date" required class="form-input" />
                             </div>
                             <p class="field-error" id="error_birth_date"></p>
                         </div>
-                        <div>
-                            <label for="birth_time" class="sr-only">Hora de nacimiento</label>
-                            <div class="relative">
-                                <input id="birth_time" name="birth_time" type="time" required class="form-input px-4 pr-10" />
-                                <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center form-input-icon" aria-hidden="true">
-                                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="9"></circle>
-                                        <polyline points="12 7 12 12 15.5 14"></polyline>
-                                    </svg>
-                                </span>
+                        <div class="form-field">
+                            <label class="sr-only" for="birth_time">Hora de nacimiento</label>
+                            <div class="form-input-shell">
+                                <input id="birth_time" name="birth_time" type="time" required step="60" class="form-input" />
                             </div>
                             <p class="field-error" id="error_birth_time"></p>
                         </div>
                     </div>
 
-                    <div class="relative">
-                        <label for="birth_place" class="sr-only">Ciudad de nacimiento</label>
-                        <div class="relative">
-                            <input id="birth_place" name="birth_place" type="text" placeholder="Ciudad de nacimiento" autocomplete="off" required class="form-input px-4 pr-10" />
-                            <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center form-input-icon" aria-hidden="true">
+                    <div class="form-field form-field--suggest">
+                        <label class="sr-only" for="birth_place">Ciudad de nacimiento</label>
+                        <div class="form-input-shell">
+                            <input id="birth_place" name="birth_place" type="text" placeholder="Ciudad de nacimiento" autocomplete="off" required class="form-input" />
+                            <span class="form-input-suffix-icon" aria-hidden="true">
                                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M12 21s-6-5.33-6-10a6 6 0 1 1 12 0c0 4.67-6 10-6 10Z"></path>
                                     <circle cx="12" cy="11" r="2"></circle>
@@ -104,14 +86,19 @@
                         <p class="field-error" id="error_birth_place"></p>
                     </div>
 
-                    <button type="submit" id="submit-btn" class="btn-cta">Calcular carta</button>
+                    <button type="submit" id="submit-btn" class="btn-cta">
+                        <span id="submit-btn-label">Calcular mi carta</span>
+                        <svg class="btn-cta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M5 12h14M13 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
                 </form>
             </div>
         </div>
 
-        <section id="results-shell" class="mt-5 hidden w-full">
+        <section id="results-shell" class="results-shell mt-5 hidden w-full">
             <nav id="result-tabs" class="tabs-row" aria-label="Resultados de la carta">
-                <button type="button" data-tab="interpretation" class="result-tab-btn" aria-selected="true">Interpretacion</button>
+                <button type="button" data-tab="interpretation" class="result-tab-btn" aria-selected="true">Interpretación</button>
                 <button type="button" data-tab="planets" class="result-tab-btn" aria-selected="false">Planetas</button>
                 <button type="button" data-tab="aspects" class="result-tab-btn" aria-selected="false">Aspectos</button>
                 <button type="button" data-tab="details" class="result-tab-btn" aria-selected="false">Detalles</button>
@@ -119,9 +106,15 @@
 
             <div id="result-panels" class="result-panels-inner">
                 <section data-panel="interpretation" class="result-panel space-y-3">
-                    <p class="section-label text-center">Interpretacion</p>
-                    <h2 class="panel-heading">Interpretacion con IA</h2>
-                    <div id="interpretation-cards" class="space-y-3"></div>
+                    <h2 class="panel-heading">Interpretación</h2>
+                    <div id="results-chart-caption" class="results-chart-caption results-chart-caption--in-panel" hidden>
+                        <span class="results-chart-caption__inner">
+                            <span class="results-chart-caption__deco" aria-hidden="true">✦</span>
+                            <span id="results-chart-caption-text" class="results-chart-caption__text"></span>
+                            <span class="results-chart-caption__deco" aria-hidden="true">✦</span>
+                        </span>
+                    </div>
+                    <div id="interpretation-cards" class="space-y-2"></div>
                 </section>
 
                 <section data-panel="planets" class="result-panel hidden space-y-3">
@@ -130,12 +123,14 @@
                     <article class="card-surface-navy-mid p-4">
                         <div id="planets-cards" class="grid gap-3 sm:grid-cols-2"></div>
                     </article>
+                    <details id="result" class="json-details json-details--planets" hidden>
+                        <summary>Ver datos técnicos (JSON)</summary>
+                        <pre id="result-content" class="json-pre"></pre>
+                    </details>
                 </section>
 
                 <section data-panel="aspects" class="result-panel hidden space-y-3">
-                    <p class="section-label text-center">Relaciones</p>
-                    <h2 class="panel-heading">Aspectos</h2>
-                    <article class="card-surface-gray p-4">
+                    <article class="card-surface-gray p-2">
                         <div class="overflow-x-auto">
                             <table class="aspects-table">
                                 <thead>
@@ -150,35 +145,32 @@
                             </table>
                         </div>
                     </article>
-                    <article class="card-surface p-4">
+                    <article class="card-surface p-2">
                         <h3 class="subpanel-title">Leyenda de simbolos</h3>
                         <p class="symbol-legend">&#9737; Sol · &#9789; Luna · &#9791; Mercurio · &#9792; Venus · &#9794; Marte · &#9795; Jupiter · &#9796; Saturno · &#9797; Urano · &#9798; Neptuno · &#9799; Pluton · <span class="symbol-legend-gold">&#9738;</span> Nodo Norte</p>
                     </article>
                 </section>
 
                 <section data-panel="details" class="result-panel hidden space-y-3">
-                    <p class="section-label text-center">Mas datos</p>
+                    <p class="section-label text-center">Más datos</p>
                     <article class="card-surface-gray p-4">
                         <h3 class="subpanel-title">Detalles</h3>
-                        <p class="body-copy mt-3">Proximamente incorporaremos mas informacion: distribucion por elementos (fuego, tierra, aire, agua), temperamentos (cardinal, mutable, fijo) y otros indicadores tecnicos.</p>
+                        <p class="body-copy mt-3">Próximamente incorporaremos más información: distribución por elementos (fuego, tierra, aire, agua), temperamentos (cardinal, mutable, fijo) y otros indicadores técnicos.</p>
                     </article>
                 </section>
             </div>
-
-            <details id="result" class="json-details" hidden>
-                <summary>Ver datos tecnicos (JSON)</summary>
-                <pre id="result-content" class="json-pre"></pre>
-            </details>
         </section>
     </main>
 
     <footer class="site-footer">
         <div class="site-footer-inner">
             <div class="footer-accent" aria-hidden="true"></div>
-            <p class="footer-text">Atlas Astral · Astrologia psicologica y carta natal</p>
+            <p class="footer-text">Atlas Astral · Astrología psicológica y carta natal</p>
         </div>
     </footer>
 
-    <script src="{% static 'js/astrology/chart_form_v2.js' %}?v=19" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js" defer></script>
+    <script src="{% static 'js/astrology/chart_form_v2.js' %}?v=29" defer></script>
 </body>
 </html>
