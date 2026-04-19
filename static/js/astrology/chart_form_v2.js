@@ -438,6 +438,41 @@ function bindCityAutocomplete() {
     });
 }
 
+function initFlatpickrBirthFields() {
+    const birthDateEl = document.getElementById("birth_date");
+    const birthTimeEl = document.getElementById("birth_time");
+    if (!birthDateEl || !birthTimeEl || typeof flatpickr !== "function") {
+        console.warn("[Atlas chart_form] flatpickr no disponible; usa texto plano para fecha/hora.");
+        return;
+    }
+    const esLocale =
+        typeof flatpickr !== "undefined" && flatpickr.l10ns && flatpickr.l10ns.es ? flatpickr.l10ns.es : undefined;
+
+    const dateOpts = {
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "d/m/Y",
+        allowInput: false,
+        disableMobile: true,
+        monthSelectorType: "static",
+        altInputClass: "form-input",
+    };
+    if (esLocale) {
+        dateOpts.locale = esLocale;
+    }
+    flatpickr(birthDateEl, dateOpts);
+
+    flatpickr(birthTimeEl, {
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "H:i",
+        time_24hr: true,
+        allowInput: false,
+        disableMobile: true,
+        minuteIncrement: 1,
+    });
+}
+
 function setupTabs() {
     resultTabs.forEach((btn) => {
         btn.addEventListener("click", () => {
@@ -867,6 +902,7 @@ setupTabs();
 bindCityAutocomplete();
 setActiveTab("interpretation");
 hideResults();
+initFlatpickrBirthFields();
 
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
